@@ -1,0 +1,165 @@
+;------------------------------------------------------------------------------------------------
+
+DATOS SEGMENT
+    
+ARRAY_TABLA DW  000, 000, 000, 000, 000, 000, 000, 000, 000, 000   
+MSG1        DB  10,13,"INGRESE NUMERO: $ "
+MSGERROR    DB  10,13,"No ha ingresado un numero del 0 al 9. Vuelva a ingresar un NUMERO$" 
+MSG2        DB  10,13,"Tabla ordenados de numeros : $"
+MSG3        DB  10,13,"- $"
+CIEN        DB  100
+DIEZ        DB  10 
+CIFRA       DB  0
+NUM         DW  0  
+
+DATOS ENDS          
+
+;------------------------------------------------------------------------------------------------
+
+PILA SEGMENT STACK
+    
+    DW 128 DUP(?)     
+    CAB_PILA LABEL WORD
+
+PILA ENDS
+
+;------------------------------------------------------------------------------------------------
+
+CODIGO SEGMENT
+
+INICIO PROC FAR
+    
+    ASSUME DS: DATOS, CS: CODIGO, SS:PILA       ;Cada registro de segmento debe ir con un segmento determinado
+    
+    PUSH DS
+    MOV AX,0
+    PUSH AX
+    
+    MOV AX, DATOS
+    MOV DS, AX
+    MOV ES, AX   
+
+;-------------------------------------- LECTURA DE DATOS -----------------------------------------
+
+MOV CX,10
+MOV DI,0 
+MOV NUM,00
+
+START:
+        MOV AX,DATOS
+        MOV DS,AX
+        MOV BL,0 
+        LEA DI,ARRAY_TABLA 
+        
+NUEVO_INGRESO:      
+  
+        LEA DX,MSG1                 ; Cargo en dx la direccion efectica de msg1
+        MOV AH,9
+        INT 21H                     ; Muestro MSG1
+        LEA DX,MSG3                 ; Cargo en dx la direccion efectica de MSG3
+        MOV AH,9
+        INT 21H                     ; Muestro MSG3
+
+INPUT:  
+        MOV AH,1
+        INT 21H                     ; Ingreso de tecla
+        
+        CMP AL, 13                  ; Reviso si el usuario presiono ENTER
+        JE EXIT                     ; Si lo hizo, voy al final del programa
+        CMP AL, 27                  ; Reviso si el usuario presiono ESC
+        JE EXIT                     ; Si lo hizo, voy al final del programa
+        CMP AL, 30H                 ; Reviso si el usuario presiono una tecla en valor de ascii menor a 0
+        JL ERROR                    ; Si lo hizo, no acepto la tecla presionada
+        CMP AL, 39H                 ; Reviso si el usuario presiono una tecla en valor de ascii mayor a 9
+        JG ERROR                    ; Si lo hizo, no acepto la tecla presionada
+        
+        INC CIFRA                   ; Incremento el valor de la variable CIFRA
+        
+        CMP CIFRA,1                 ; Si CIFRA=1, el digito ingresado corresponde a la centena
+        JZ  PORCIEN  
+        
+        CMP CIFRA,2                 ; Si CIFRA=2, el digito ingresado corresponde a la decena
+        JZ  PORDIEZ
+                                    ; Si CIFRA!=1 Y CIFRA!=2, el digito ingresado corresponde a la unidad
+        SUB AL,30H                  ; Resto 30h al codigo ascii de la tecla oprimida para obtener el valor decimal
+        MOV AH, 00
+        ADD NUM,AX                  ; En la variable NUM voy armando el numero que se va ingresando
+        
+        LEA DX,MSG3                 ; Bajada de linea
+        MOV AH,9
+        INT 21H                     ; Muestro MSG3
+        
+        MOV CIFRA,00                ; Reestablezco el valor de CIFRA=0
+        
+        MOV BX,NUM                  ; Cargo el numero final a AL
+        MOV [DI],BX                 ; Cargo el valor de AL en la posicion DI del Array_tabla
+        
+        ADD DI, 2                      ; Apunto a la posicion siguiente del array                                                                           
+        MOV NUM,00                  ; Reestablezco el valor de NUM=0    
+        MOV AL,00                   ; Reestablezco el valor de AL=0
+        
+        LOOP NUEVO_INGRESO          ; Bucle que se repite hasta ingresar los 10 numeros
+        JMP ORDENAMIENTO            ; Salto al codigo para ordenar
+        
+PORCIEN:                            ; Centena
+        SUB AL,30H
+        MOV AH, 00                  ; Resto 30h al codigo ascii de la tecla oprimida para obtener el valor decimal
+        MUL CIEN                    ; Multiplico por 100
+        ADD NUM,AX                  ; En la variable NUM voy armando el numero que se va ingresando
+        JMP INPUT                   ; Voy a dirigir el 2do digito
+        
+PORDIEZ:
+        SUB AL,30H
+        MOV AH, 00                  ; Resto 30h al codigo ascii de la tecla oprimida para obtener el valor decimal
+        MUL DIEZ                    ; Multiplico por 10
+        ADD NUM,AX                  ; En la variable NUM voy armando el numero que se va ingresando
+        JMP INPUT                   ; Voy a dirigir el 3er digito
+ERROR:
+        LEA DX,MSGERROR             ; Muestro el mensaje de error
+        MOV AH,9
+        INT 21H 
+        JMP NUEVO_INGRESO           ; Vuelvo a pedir que ingrese un numero
+
+
+
+;------------------------------------- CODIGO DEL PROGRAMA --------------------------------------
+
+ORDENAMIENTO:
+        MOV CX,10
+        MOV SI,0
+        MOV DI,0
+
+BURBUJA:
+        PUSH CX                   ; Coloco en la pila el valor de CX
+        LEA SI,ARRAY_TABLA        ; Paso la direccion efectiva del array a SI  
+        MOV DI,SI                 ; Paso la direccion efectiva del array a DI
+
+BUCLE2:
+        ADD DI, 2                    ; Incremento DI para poder comparar con la siguiente posicion
+        MOV AL,[SI]               ; Paso el valor que se encuentra en la direccion de SI a AL
+        CMP AL,[DI]               ; Comparo con el valor que se encuentra en la direccion de DI   
+        
+        JB INTERCAMBIO            ; Salta a la etiqueta INTERCAMBIO si es menor
+        JA MAYOR                  ; Salta a la etiqueta MAYOR si es mayor
+        
+        
+INTERCAMBIO:   
+
+        MOV AH,[DI]               ; Paso el valor de la posicion DI a AH 
+        MOV [DI],AL               ; Paso el valor de AL a la posicion DI 
+        MOV [SI],AH               ; Paso el valor de AH a la posicion SI
+
+
+
+MAYOR:  
+        INC SI
+        LOOP BUCLE2  
+        POP CX
+        LOOP BURBUJA 
+        
+EXIT: 
+        ;RET 
+        INICIO ENDP
+        CODIGO ENDS
+
+END START
