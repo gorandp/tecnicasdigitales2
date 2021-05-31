@@ -16,3 +16,4 @@ De todas formas se puede usar el linter que se recomienda en el [Setup](#setup) 
 ## Links para leer
 
 - Coding standard asm style: http://www.sourceformat.com/coding-standard-asm-style.htm
+- Códigos para ver del 8086: https://github.com/apsrcreatix/8086
