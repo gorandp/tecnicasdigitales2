@@ -12,3 +12,7 @@ Este post de reddit indica que no se puede usar los recursos existentes de los O
 Por lo que se apunta a usar el EMU8086 que nos pasó el profe.
 
 De todas formas se puede usar el linter que se recomienda en el [Setup](#setup) para escribir el código y luego probarlo en el emulador (aunque se pone molesto porque te sugiere todo el tiempo cosas...).
+
+## Links para leer
+
+- Coding standard asm style: http://www.sourceformat.com/coding-standard-asm-style.htm
