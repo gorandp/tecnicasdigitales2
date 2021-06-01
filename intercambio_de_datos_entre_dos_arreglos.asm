@@ -12,47 +12,49 @@ code segment
   assume ds:data, cs:code
 
   ; Inicialización
-                ; Inicializo el segmento de datos 'ds'
-  start:    mov ax, data
-            mov ds, ax
-            ; Carga en registro 'si' la dirección efectiva de
-            ; array1
-            lea si, array1
-            ; Carga en registro 'di' la dirección efectiva de
-            ; array2
-            lea di, array2
-            ; Inicializa el contador en 5
-            mov cx, 05H
+  start:
+    ; Inicializo el segmento de datos 'ds'
+    mov ax, data
+    mov ds, ax
+    ; Carga en registro 'si' la dirección efectiva de
+    ; array1
+    lea si, array1
+    ; Carga en registro 'di' la dirección efectiva de
+    ; array2
+    lea di, array2
+    ; Inicializa el contador en 5
+    mov cx, 05H
 
   ; Código para intercambiar valores
-            ; Mueve el contenido de la dirección 'si' hacia el
-            ; acumulador
-  swap:     mov ax, [si]
-            ; Mueve el contenido de la dirección 'di' hacia 'bx'
-            mov bx, [di]
-            ; Mueve el contenido de 'bx' hacia la posición dada
-            ; por el registro 'si'
-            mov [si], bx
-            ; Lo mismo que lo anterior solo que con 'ax' y 'di'
-            mov [di], ax
+  swap:
+    ; Mueve el contenido de la dirección 'si' hacia el
+    ; acumulador
+    mov ax, [si]
+    ; Mueve el contenido de la dirección 'di' hacia 'bx'
+    mov bx, [di]
+    ; Mueve el contenido de 'bx' hacia la posición dada
+    ; por el registro 'si'
+    mov [si], bx
+    ; Lo mismo que lo anterior solo que con 'ax' y 'di'
+    mov [di], ax
 
-            ; Incremento 'si' para apuntar al siguiente elemento
-            ; (recordar que los elementos son words, es decir,
-            ; de 2 bytes, por eso incremento 2 veces)
-            inc si
-            inc si
+    ; Incremento 'si' para apuntar al siguiente elemento
+    ; (recordar que los elementos son words, es decir,
+    ; de 2 bytes, por eso incremento 2 veces)
+    inc si
+    inc si
 
-            ; Ídem a 'si'
-            inc di
-            inc di
+    ; Ídem a 'si'
+    inc di
+    inc di
 
-            ; Decrementa registro 'cx' y salta a 'swap' mientras
-            ; sea distinto de cero
-            loop swap
+    ; Decrementa registro 'cx' y salta a 'swap' mientras
+    ; sea distinto de cero
+    loop swap
 
-            ; Devuelve control al sistema operativo
-            mov ah, 4Ch
-            int 21h ; DOS Interrupt
+    ; Devuelve control al sistema operativo
+    mov ah, 4Ch
+    int 21h ; DOS Interrupt
 code ends
 
 ; Fin de programa
