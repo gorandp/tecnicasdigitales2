@@ -1,3 +1,8 @@
+; Clase 4 - Unidad2.ppsx
+;
+; Problema Nro. 5: Ejemplo de suma de dos cifras ASCII en formato BCD
+;                  con uP 8088
+
 DATOS SEGMENT
     TABLA       DB      26  DUP (64)
                 DB      36
