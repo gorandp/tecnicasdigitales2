@@ -68,7 +68,7 @@ start:
         mul diez           ; Multiplico por diez para agregar la unidad, decena o centena
         mov dl, num_hex    ; Ingreso el numero en dx (dh: 00, dl: 30 - 39)
         mov dh, 00
-        sub dx, 30         ; Le resto 30h para obtener el numero real
+        sub dx, 30h        ; Le resto 30h para obtener el numero real
         add ax, dx         ; Sumo este numero con ax
         mov num, ax        ; Lo guardo en num
         cmp cont, 03       ; Tomamos como que se ingreso enter si se ingresan 3 digitos
